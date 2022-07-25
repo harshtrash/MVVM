@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head id="header">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>MVVM</title>
+    <link rel="stylesheet" href="node_modules/todomvc-common/base.css">
+    <link rel="stylesheet" href="node_modules/todomvc-app-css/index.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+
+<style>
+    /*覆盖button的css*/
+    .button1 {
+        -webkit-transition-duration: 0.4s;
+        transition-duration: 0.4s;
+        padding: 12px 32px;
+        text-align: center;
+        background-color: white;
+        color: black;
+        border: 2px solid #4CAF50;
+        border-radius:5px;
+    }
+    .button1:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
+</style>
+
+<body >
+<h2>双向绑定(MVVM)</h2>
+<div id="mvvm-app">
+    <input type="text" v-model="someStr">
+    <input type="text" v-model="child.someStr">
+    <p>{{ getHelloWord }}</p>
+    <p v-html="htmlStr"></p>
+    <button v-on:click="clickBtn" class="button1"><strong>change model</strong></button>
+</div>
+<h2>单向绑定</h2>
+<div id="app">
+    姓名：{{names}}
+    <br> 年龄：{{age}}
+</div>
+
+<h5>双向绑定：可以在输入框中编写文字，页面同步更新，按下change mode 键可以随机重置文字</h5>
+<h5>单向绑定：可以渲染出html文件中_data中的内容，修改_data内容刷新页面可以改变</h5>
+
+<script src="http://cdn.bootcss.com/vue/1.0.25/vue.js"></script>
+<script src="./js/observer.js"></script>
+<script src="./js/watcher.js"></script>
+<script src="./js/compile.js"></script>
+<script src="./js/mvvm.js"></script>
+<script>
+    let vm = new MVVM({
+        el: '#mvvm-app',
+        data: {
+            someStr: 'hello ',
+            className: 'btn',
+            //htmlStr: '<span style="color: #f00;">red</span>',
+            child: {
+                someStr: 'World !'
+            }
+        },
+
+        computed: {
+            getHelloWord: function () {
+                return this.someStr + this.child.someStr;
+            }
+        },
+
+        methods: {
+            clickBtn: function (e) {
+                let randomStrArr = ['Tom', 'Mike', 'Angela', 'Eden'];
+                this.child.someStr = randomStrArr[parseInt(Math.random() * 4)]+"!";
+                this.someStr = 'Hi,';
+                window.alert("变更成功！")
+            }
+        }
+    });
+
+    vm.$watch('child.someStr', function() {
+        console.log(arguments);
+    });
+//一下是单向绑定的实现
+    let el1 = document.getElementById('app');
+    let template = el1.innerHTML;
+    let _data = {
+        names: 'James',
+        age: 34
+    };
+
+    let data = new Proxy(_data, {
+        set(obj, names, value) {
+            obj[names] = value;
+            render();
+        }
+    });
+
+    render();
+
+    function render() {
+        el1.innerHTML = template.replace(/\{\{\w+\}\}/g, str => {
+            str = str.substring(2, str.length - 2);
+            return _data[str];
+        });
+    }
+
+</script>
+
+</body>
+</html>

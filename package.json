@@ -1,0 +1,14 @@
+{
+  "name": "mvvm",
+  "scripts": {
+    "test": "jest"
+  },
+  "version": "1.0.0",
+  "description": "test1",
+  "dependencies": {
+    "jest": "^28.1.3"
+  },
+  "devDependencies": {},
+  "author": "qyw",
+  "license": "ISC"
+}
